@@ -202,24 +202,36 @@ Figure \ref{fig:foldchange}
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{))}
+
+\CommentTok{# volcano plot of YY1 knockdown}
 \KeywordTok{plot}\NormalTok{(express}\OperatorTok{$}\NormalTok{YY1}\OperatorTok{$}\NormalTok{fc, }
      \OperatorTok{-}\KeywordTok{log10}\NormalTok{(express}\OperatorTok{$}\NormalTok{YY1}\OperatorTok{$}\NormalTok{pvalue),}
      \DataTypeTok{xlab =} \StringTok{'Fold-change (log_2)'}\NormalTok{,}
-     \DataTypeTok{ylab =} \StringTok{'P-value (-log_10)'}\NormalTok{)}
+     \DataTypeTok{ylab =} \StringTok{'P-value (-log_10)'}\NormalTok{,}
+     \DataTypeTok{xlim =} \KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{), }\DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{6}\NormalTok{))}
+\KeywordTok{title}\NormalTok{(}\StringTok{'(A)'}\NormalTok{)}
+
+\CommentTok{# volcano plot of YY2 knockdown}
 \KeywordTok{plot}\NormalTok{(express}\OperatorTok{$}\NormalTok{YY2}\OperatorTok{$}\NormalTok{fc, }
      \OperatorTok{-}\KeywordTok{log10}\NormalTok{(express}\OperatorTok{$}\NormalTok{YY2}\OperatorTok{$}\NormalTok{pvalue),}
      \DataTypeTok{xlab =} \StringTok{'Fold-change (log_2)'}\NormalTok{,}
-     \DataTypeTok{ylab =} \StringTok{'P-value (-log_10)'}\NormalTok{)}
+     \DataTypeTok{ylab =} \StringTok{'P-value (-log_10)'}\NormalTok{,}
+     \DataTypeTok{xlim =} \KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{), }\DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{6}\NormalTok{))}
+\KeywordTok{title}\NormalTok{(}\StringTok{'(B)'}\NormalTok{)}
+
+\CommentTok{# plot fold-change of YY1 and YY2}
 \KeywordTok{plot}\NormalTok{(express}\OperatorTok{$}\NormalTok{YY1}\OperatorTok{$}\NormalTok{fc[}\KeywordTok{order}\NormalTok{(express}\OperatorTok{$}\NormalTok{YY1}\OperatorTok{$}\NormalTok{gene)],}
 \NormalTok{     express}\OperatorTok{$}\NormalTok{YY2}\OperatorTok{$}\NormalTok{fc[}\KeywordTok{order}\NormalTok{(express}\OperatorTok{$}\NormalTok{YY2}\OperatorTok{$}\NormalTok{gene)],}
      \DataTypeTok{xlab =} \StringTok{'YY1-knockdown (log_2)'}\NormalTok{,}
-     \DataTypeTok{ylab =} \StringTok{'YY2-knockdown (log_2)'}\NormalTok{)}
+     \DataTypeTok{ylab =} \StringTok{'YY2-knockdown (log_2)'}\NormalTok{,}
+     \DataTypeTok{xlim =} \KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{), }\DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\OperatorTok{-}\DecValTok{4}\NormalTok{, }\DecValTok{4}\NormalTok{))}
+\KeywordTok{title}\NormalTok{(}\StringTok{'(C)'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{figure}
 
-{\centering \includegraphics{targetFlow_files/figure-latex/foldchange-1} 
+{\centering \includegraphics[width=1\linewidth]{targetFlow_files/figure-latex/foldchange-1} 
 
 }
 
@@ -284,87 +296,69 @@ Figure \ref{fig:functions}
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\KeywordTok{map}\NormalTok{(ap, }\OperatorTok{~}\KeywordTok{plot}\NormalTok{(.x}\OperatorTok{$}\NormalTok{distance, }
-\NormalTok{              .x}\OperatorTok{$}\NormalTok{peak_score,}
-              \DataTypeTok{xlab =} \StringTok{'Distance'}\NormalTok{,}
-              \DataTypeTok{ylab =} \StringTok{'Peak Score'}\NormalTok{))}
-\end{Highlighting}
-\end{Shaded}
 
-\begin{verbatim}
-## $YY1
-## NULL
-## 
-## $YY2
-## NULL
-\end{verbatim}
+\CommentTok{# plot distance by score of associate peaks}
+\KeywordTok{map2}\NormalTok{(ap, }\KeywordTok{c}\NormalTok{(}\StringTok{'(A)'}\NormalTok{, }\StringTok{'(B)'}\NormalTok{),}
+     \OperatorTok{~}\NormalTok{\{}
+       \KeywordTok{plot}\NormalTok{(.x}\OperatorTok{$}\NormalTok{distance,}
+\NormalTok{            .x}\OperatorTok{$}\NormalTok{peak_score,}
+            \DataTypeTok{xlab =} \StringTok{'Distance'}\NormalTok{,}
+            \DataTypeTok{ylab =} \StringTok{'Peak Score'}\NormalTok{)}
+       \KeywordTok{title}\NormalTok{(.y)}
+\NormalTok{     \})}
 
-\begin{Shaded}
-\begin{Highlighting}[]
+\CommentTok{# make labels, colors and groups}
 \NormalTok{labs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'down'}\NormalTok{, }\StringTok{'none'}\NormalTok{, }\StringTok{'up'}\NormalTok{)}
 \NormalTok{cols <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'green'}\NormalTok{, }\StringTok{'gray'}\NormalTok{, }\StringTok{'red'}\NormalTok{)}
-      
+
+\CommentTok{# make three groups by quantiles      }
 \NormalTok{groups <-}\StringTok{ }\KeywordTok{map}\NormalTok{(dt,}
               \OperatorTok{~}\KeywordTok{cut}\NormalTok{(.x}\OperatorTok{$}\NormalTok{stat,}
                    \DataTypeTok{breaks =} \KeywordTok{quantile}\NormalTok{(.x}\OperatorTok{$}\NormalTok{stat, }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{.1}\NormalTok{, }\FloatTok{.9}\NormalTok{, }\DecValTok{1}\NormalTok{)),}
                    \DataTypeTok{labels =}\NormalTok{ labs))}
-\KeywordTok{map2}\NormalTok{(dt, groups, }
-    \OperatorTok{~}\NormalTok{\{}\KeywordTok{plot_predictions}\NormalTok{(.}\OperatorTok{$}\NormalTok{score_rank,}
-                       \DataTypeTok{group =}\NormalTok{ .y,}
+
+\CommentTok{# plot the group functions}
+\KeywordTok{pmap}\NormalTok{(}\KeywordTok{list}\NormalTok{(dt, groups, }\KeywordTok{c}\NormalTok{(}\StringTok{'(C)'}\NormalTok{, }\StringTok{'(D)'}\NormalTok{)),}
+    \ControlFlowTok{function}\NormalTok{(x, y, z) \{}
+      \KeywordTok{plot_predictions}\NormalTok{(x}\OperatorTok{$}\NormalTok{score_rank,}
+                       \DataTypeTok{group =}\NormalTok{ y,}
                        \DataTypeTok{colors =}\NormalTok{ cols,}
                        \DataTypeTok{labels =}\NormalTok{ labs,}
                        \DataTypeTok{xlab =} \StringTok{'Regulatory Potential'}\NormalTok{,}
                        \DataTypeTok{ylab =} \StringTok{'ECDF'}\NormalTok{)}
       
-      \KeywordTok{invisible}\NormalTok{(}\OtherTok{NULL}\NormalTok{)}
+      \KeywordTok{title}\NormalTok{(z)}
 \NormalTok{    \})}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{figure}
 
-{\centering \includegraphics{targetFlow_files/figure-latex/functions-1} 
+{\centering \includegraphics[width=1\linewidth]{targetFlow_files/figure-latex/functions-1} 
 
 }
 
 \caption{Predicted functions of YY1 and YY2 on their specific targets.}\label{fig:functions}
 \end{figure}
 
-\begin{verbatim}
-## $YY1
-## NULL
-## 
-## $YY2
-## NULL
-\end{verbatim}
-
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{map2_df}\NormalTok{(dt, groups,}
+\CommentTok{# test individual factor functions}
+\KeywordTok{map2}\NormalTok{(dt, groups,}
      \OperatorTok{~}\KeywordTok{test_predictions}\NormalTok{(.x}\OperatorTok{$}\NormalTok{rank,}
                        \DataTypeTok{group =}\NormalTok{ .y,}
-                       \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'down'}\NormalTok{, }\StringTok{'up'}\NormalTok{)) }\OperatorTok{%>%}
-\StringTok{       }\KeywordTok{tidy}\NormalTok{(),}
-     \DataTypeTok{.id =} \StringTok{'Factor'}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{  }\NormalTok{knitr}\OperatorTok{::}\KeywordTok{kable}\NormalTok{(}
-    \DataTypeTok{caption =} \StringTok{'Testing for statistical significance of the regulated gene groups.'}\NormalTok{,}
-    \DataTypeTok{label =} \StringTok{'tests'}\NormalTok{)}
+                       \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'down'}\NormalTok{, }\StringTok{'up'}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{table}[t]
-
-\caption{\label{tab:tests}Testing for statistical significance of the regulated gene groups.}
+\begin{table}[htbp]
+\caption{\label{tab:tests} Testing for statistical significance of the regulated gene groups.}
 \centering
-\begin{tabular}{l|r|r|l|l}
-\hline
-Factor & statistic & p.value & method & alternative\\
-\hline
-YY1 & 0.2236994 & 0 & Two-sample Kolmogorov-Smirnov test & two-sided\\
-\hline
-YY2 & 0.1492537 & 0 & Two-sample Kolmogorov-Smirnov test & two-sided\\
-\hline
-\end{tabular}
+\begin{tabledata}{@{}lllll@{}}
+\header Factor & Statistic & P.value & Method & Alternative\\
+\row YY1 & 0.224 & 2.2e-16 & Two-sample KS test & two-sided\\
+\row YY2 & 0.149 & 2.5e-15 & Two-sample KS test & two-sided\\
+\end{tabledata}
 \end{table}
 
 Table \ref{tab:tests}
@@ -415,35 +409,70 @@ Figure \ref{fig:function}
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+
+\CommentTok{# plot distiace by score for associated peaks}
 \KeywordTok{plot}\NormalTok{(common_ap}\OperatorTok{$}\NormalTok{distance,}
 \NormalTok{     common_ap}\OperatorTok{$}\NormalTok{peak_score,}
      \DataTypeTok{xlab =} \StringTok{'Distance'}\NormalTok{,}
      \DataTypeTok{ylab =} \StringTok{'Peak Score'}\NormalTok{)}
+\KeywordTok{title}\NormalTok{(}\StringTok{'(A)'}\NormalTok{)}
 
+\CommentTok{# make labels, colors and gorups}
 \NormalTok{labs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'competitive'}\NormalTok{, }\StringTok{'none'}\NormalTok{, }\StringTok{'cooperative'}\NormalTok{)}
 \NormalTok{cols <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'green'}\NormalTok{, }\StringTok{'gray'}\NormalTok{, }\StringTok{'red'}\NormalTok{)}
-      
+
+\CommentTok{# make three groups by quantiles      }
 \NormalTok{common_groups <-}\StringTok{ }\KeywordTok{cut}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{stat,}
                      \DataTypeTok{breaks =} \KeywordTok{quantile}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{stat, }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{.1}\NormalTok{, }\FloatTok{.9}\NormalTok{, }\DecValTok{1}\NormalTok{)),}
                      \DataTypeTok{labels =}\NormalTok{ labs)}
 
+\CommentTok{# plot predicted function}
 \KeywordTok{plot_predictions}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{score_rank,}
                  \DataTypeTok{group =}\NormalTok{ common_groups,}
                  \DataTypeTok{colors =}\NormalTok{ cols,}
                  \DataTypeTok{labels =}\NormalTok{ labs,}
                  \DataTypeTok{xlab =} \StringTok{'Regulatory Potential'}\NormalTok{,}
                  \DataTypeTok{ylab =} \StringTok{'ECDF'}\NormalTok{)}
+\KeywordTok{title}\NormalTok{(}\StringTok{'(B)'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{figure}
 
-{\centering \includegraphics{targetFlow_files/figure-latex/function-1} 
+{\centering \includegraphics[width=1\linewidth]{targetFlow_files/figure-latex/function-1} 
 
 }
 
 \caption{Predicted function of YY1 and YY2 on their shared targets.}\label{fig:function}
 \end{figure}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# test factors are cooperative}
+\KeywordTok{test_predictions}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{score_rank,}
+                 \DataTypeTok{group =}\NormalTok{ common_groups,}
+                 \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'cooperative'}\NormalTok{, }\StringTok{'none'}\NormalTok{),}
+                 \DataTypeTok{alternative =} \StringTok{'greater'}\NormalTok{)}
+
+\CommentTok{# test factors are more cooperative than competitive}
+\KeywordTok{test_predictions}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{score_rank,}
+                 \DataTypeTok{group =}\NormalTok{ common_groups,}
+                 \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'cooperative'}\NormalTok{, }\StringTok{'competitive'}\NormalTok{),}
+                 \DataTypeTok{alternative =} \StringTok{'greater'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{table}[htbp]
+\caption{\label{tab:test} Testing for statistical significance of combined functions of the two factors.}
+\centering
+\begin{tabledata}{@{}lllll@{}}
+\header Compare & Satistic & P.value & Method & Alternative\\
+\row Coop vs None & 0.168 & 1.5e-30 & KS test & The CDF of x lies above that of y\\
+\row Coop vs Comp & 0.151 & 2.2e-16 & KS test & The CDF of x lies above that of y\\
+\end{tabledata}
+\end{table}
+
+Table \ref{tab:test}
 
 \hypertarget{binding-motif-analysis}{%
 \subsection{Binding motif analysis}\label{binding-motif-analysis}}
@@ -497,13 +526,19 @@ Figure \ref{fig:occurences}
 \begin{Shaded}
 \begin{Highlighting}[]
 \KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{2}\NormalTok{))}
-\KeywordTok{map}\NormalTok{(bcout, }\OperatorTok{~}\KeywordTok{plot}\NormalTok{(}\KeywordTok{toptable}\NormalTok{(.x, }\DecValTok{1}\NormalTok{)))}
+
+\CommentTok{# plot the occurences of consensus sequesnce in the regions}
+\KeywordTok{map2}\NormalTok{(bcout, }\KeywordTok{c}\NormalTok{(}\StringTok{'(A)'}\NormalTok{, }\StringTok{'(B)'}\NormalTok{),}
+     \OperatorTok{~}\NormalTok{\{}
+       \KeywordTok{plot}\NormalTok{(}\KeywordTok{toptable}\NormalTok{(.x, }\DecValTok{1}\NormalTok{))}
+       \KeywordTok{title}\NormalTok{(.y)}
+\NormalTok{     \})}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{figure}
 
-{\centering \includegraphics{targetFlow_files/figure-latex/occurences-1} 
+{\centering \includegraphics[width=1\linewidth]{targetFlow_files/figure-latex/occurences-1} 
 
 }
 
@@ -512,88 +547,27 @@ Figure \ref{fig:occurences}
 
 \begin{verbatim}
 ## $competitive
-## $competitive$rect
-## $competitive$rect$w
-## [1] 176.837
-## 
-## $competitive$rect$h
-## [1] 198.1241
-## 
-## $competitive$rect$left
-## [1] -2.96
-## 
-## $competitive$rect$top
-## [1] 79.04
-## 
-## 
-## $competitive$text
-## $competitive$text$x
-##  [1] 37.26069 37.26069 37.26069 37.26069 37.26069 37.26069 37.26069
-##  [8] 37.26069 37.26069 37.26069 37.26069 37.26069 37.26069
-## 
-## $competitive$text$y
-##  [1]   64.888276   50.736552   36.584828   22.433103    8.281379
-##  [6]   -5.870345  -20.022069  -34.173793  -48.325517  -62.477241
-## [11]  -76.628966  -90.780690 -104.932414
-## 
-## 
+## NULL
 ## 
 ## $cooperative
-## $cooperative$rect
-## $cooperative$rect$w
-## [1] 128.4046
-## 
-## $cooperative$rect$h
-## [1] 85.46897
-## 
-## $cooperative$rect$left
-## [1] -2.96
-## 
-## $cooperative$rect$top
-## [1] 53.04
-## 
-## 
-## $cooperative$text
-## $cooperative$text$x
-## [1] 37.26069 37.26069 37.26069 37.26069 37.26069 37.26069 37.26069 37.26069
-## 
-## $cooperative$text$y
-## [1]  43.543448  34.046897  24.550345  15.053793   5.557241  -3.939310
-## [7] -13.435862 -22.932414
+## NULL
 \end{verbatim}
 
 Figure \ref{fig:motifs}
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\KeywordTok{map}\NormalTok{(bcout, }\OperatorTok{~}\KeywordTok{seqLogo}\NormalTok{(}\KeywordTok{pwm}\NormalTok{(}\KeywordTok{toptable}\NormalTok{(.x, }\DecValTok{1}\NormalTok{))))}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\CommentTok{# solution: https://support.bioconductor.org/p/35240/}
-\NormalTok{mySeqLogo =}\StringTok{ }\NormalTok{seqLogo}\OperatorTok{::}\NormalTok{seqLogo}
-
-\NormalTok{bad =}\StringTok{ }\NormalTok{(}\KeywordTok{sapply}\NormalTok{( }\KeywordTok{body}\NormalTok{(mySeqLogo), }\StringTok{"=="}\NormalTok{, }\StringTok{"grid.newpage()"}\NormalTok{) }\OperatorTok{|}
-\StringTok{           }\KeywordTok{sapply}\NormalTok{( }\KeywordTok{body}\NormalTok{(mySeqLogo), }\StringTok{"=="}\NormalTok{, }\StringTok{"par(ask = FALSE)"}\NormalTok{))}
-\KeywordTok{body}\NormalTok{(mySeqLogo)[bad] =}\StringTok{ }\OtherTok{NULL}
-
-\KeywordTok{grid.newpage}\NormalTok{()}
-\KeywordTok{pushViewport}\NormalTok{(}\KeywordTok{viewport}\NormalTok{(}\DataTypeTok{layout =} \KeywordTok{grid.layout}\NormalTok{(}\DecValTok{1}\NormalTok{,}\DecValTok{2}\NormalTok{)))}
-\KeywordTok{pushViewport}\NormalTok{(}\KeywordTok{viewport}\NormalTok{(}\DataTypeTok{layout.pos.col =} \DecValTok{1}\NormalTok{, }\DataTypeTok{layout.pos.row =} \DecValTok{1}\NormalTok{))}
-\KeywordTok{mySeqLogo}\NormalTok{(}\KeywordTok{pwm}\NormalTok{(}\KeywordTok{toptable}\NormalTok{(bcout}\OperatorTok{$}\NormalTok{competitive, }\DecValTok{1}\NormalTok{)))}
-\KeywordTok{popViewport}\NormalTok{(}\DecValTok{1}\NormalTok{)}
-
-\KeywordTok{pushViewport}\NormalTok{(}\KeywordTok{viewport}\NormalTok{(}\DataTypeTok{layout.pos.col =} \DecValTok{2}\NormalTok{, }\DataTypeTok{layout.pos.row =} \DecValTok{1}\NormalTok{))}
-\KeywordTok{mySeqLogo}\NormalTok{(}\KeywordTok{pwm}\NormalTok{(}\KeywordTok{toptable}\NormalTok{(bcout}\OperatorTok{$}\NormalTok{cooperative, }\DecValTok{1}\NormalTok{)))}
-\KeywordTok{popViewport}\NormalTok{(}\DecValTok{1}\NormalTok{) }
+\KeywordTok{map}\NormalTok{(bcout, }\KeywordTok{c}\NormalTok{(}\StringTok{'(A)'}\NormalTok{, }\StringTok{'(B)'}\NormalTok{),}
+    \OperatorTok{~}\NormalTok{\{}
+      \KeywordTok{seqLogo}\NormalTok{(}\KeywordTok{pwm}\NormalTok{(}\KeywordTok{toptable}\NormalTok{(.x, }\DecValTok{1}\NormalTok{)))}
+      \KeywordTok{title}\NormalTok{(.y)}
+\NormalTok{    \})}
 \end{Highlighting}
 \end{Shaded}
 
 \begin{figure}
 
-{\centering \includegraphics{targetFlow_files/figure-latex/motifs-1} 
+{\centering \includegraphics[width=1\linewidth]{targetFlow_files/figure-latex/motifs-1} 
 
 }
 

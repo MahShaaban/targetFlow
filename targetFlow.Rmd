@@ -104,20 +104,32 @@ express <- map(expression_files,
 
 Figure \@ref(fig:foldchange)
 
-```{r foldchange,fig.height=3,fig.cap='Differential expression between factor knockdown and wild-type in HeLa cells.'}
+```{r foldchange,fig.height=4,fig.width=12,out.width='100%',fig.cap='Differential expression between factor knockdown and wild-type in HeLa cells.'}
 par(mfrow = c(1, 3))
+
+# volcano plot of YY1 knockdown
 plot(express$YY1$fc, 
      -log10(express$YY1$pvalue),
      xlab = 'Fold-change (log_2)',
-     ylab = 'P-value (-log_10)')
+     ylab = 'P-value (-log_10)',
+     xlim = c(-4, 4), ylim = c(0, 6))
+title('(A)')
+
+# volcano plot of YY2 knockdown
 plot(express$YY2$fc, 
      -log10(express$YY2$pvalue),
      xlab = 'Fold-change (log_2)',
-     ylab = 'P-value (-log_10)')
+     ylab = 'P-value (-log_10)',
+     xlim = c(-4, 4), ylim = c(0, 6))
+title('(B)')
+
+# plot fold-change of YY1 and YY2
 plot(express$YY1$fc[order(express$YY1$gene)],
      express$YY2$fc[order(express$YY2$gene)],
      xlab = 'YY1-knockdown (log_2)',
-     ylab = 'YY2-knockdown (log_2)')
+     ylab = 'YY2-knockdown (log_2)',
+     xlim = c(-4, 4), ylim = c(-4, 4))
+title('(C)')
 ```
 
 ## Preparing genome annotation
@@ -167,43 +179,57 @@ dt <- map2(peaks, regions,
 
 Figure \@ref(fig:functions)
 
-```{r functions,fig.cap='Predicted functions of YY1 and YY2 on their specific targets.'}
+```{r functions,results='hide',fig.height=10,fig.width=10,out.width='100%',fig.cap='Predicted functions of YY1 and YY2 on their specific targets.'}
 par(mfrow = c(2, 2))
-map(ap, ~plot(.x$distance, 
-              .x$peak_score,
-              xlab = 'Distance',
-              ylab = 'Peak Score'))
 
+# plot distance by score of associate peaks
+map2(ap, c('(A)', '(B)'),
+     ~{
+       plot(.x$distance,
+            .x$peak_score,
+            xlab = 'Distance',
+            ylab = 'Peak Score')
+       title(.y)
+     })
+
+# make labels, colors and groups
 labs <- c('down', 'none', 'up')
 cols <- c('green', 'gray', 'red')
-      
+
+# make three groups by quantiles      
 groups <- map(dt,
               ~cut(.x$stat,
                    breaks = quantile(.x$stat, c(0, .1, .9, 1)),
                    labels = labs))
-map2(dt, groups, 
-    ~{plot_predictions(.$score_rank,
-                       group = .y,
+
+# plot the group functions
+pmap(list(dt, groups, c('(C)', '(D)')),
+    function(x, y, z) {
+      plot_predictions(x$score_rank,
+                       group = y,
                        colors = cols,
                        labels = labs,
                        xlab = 'Regulatory Potential',
                        ylab = 'ECDF')
       
-      invisible(NULL)
+      title(z)
     })
 ```
 
-```{r tests}
-map2_df(dt, groups,
+```{r tests,eval=FALSE}
+# test individual factor functions
+map2(dt, groups,
      ~test_predictions(.x$rank,
                        group = .y,
-                       compare = c('down', 'up')) %>%
-       tidy(),
-     .id = 'Factor') %>%
-  knitr::kable(
-    caption = 'Testing for statistical significance of the regulated gene groups.',
-    label = 'tests')
+                       compare = c('down', 'up')))
 ```
+
+: (\#tab:tests) Testing for statistical significance of the regulated gene groups.
+
+|Factor | Statistic| P.value|Method             |Alternative |
+|-------|----------|--------|-------------------|------------|
+|YY1    | 0.224    | 2.2e-16|Two-sample KS test |two-sided   |
+|YY2    | 0.149    | 2.5e-15|Two-sample KS test |two-sided   |
 
 Table \@ref(tab:tests)
 
@@ -243,27 +269,57 @@ common_dt <- direct_targets(peaks = common_peaks,
 
 Figure \@ref(fig:function)
 
-```{r function,fig.height=3,fig.cap='Predicted function of YY1 and YY2 on their shared targets.'}
+```{r function,fig.height=5,fig.width=10,out.width='100%',fig.cap='Predicted function of YY1 and YY2 on their shared targets.'}
 par(mfrow = c(1, 2))
+
+# plot distiace by score for associated peaks
 plot(common_ap$distance,
      common_ap$peak_score,
      xlab = 'Distance',
      ylab = 'Peak Score')
+title('(A)')
 
+# make labels, colors and gorups
 labs <- c('competitive', 'none', 'cooperative')
 cols <- c('green', 'gray', 'red')
-      
+
+# make three groups by quantiles      
 common_groups <- cut(common_dt$stat,
                      breaks = quantile(common_dt$stat, c(0, .1, .9, 1)),
                      labels = labs)
 
+# plot predicted function
 plot_predictions(common_dt$score_rank,
                  group = common_groups,
                  colors = cols,
                  labels = labs,
                  xlab = 'Regulatory Potential',
                  ylab = 'ECDF')
+title('(B)')
 ```
+
+```{r test,eval=FALSE}
+# test factors are cooperative
+test_predictions(common_dt$score_rank,
+                 group = common_groups,
+                 compare = c('cooperative', 'none'),
+                 alternative = 'greater')
+
+# test factors are more cooperative than competitive
+test_predictions(common_dt$score_rank,
+                 group = common_groups,
+                 compare = c('cooperative', 'competitive'),
+                 alternative = 'greater')
+```
+
+: (\#tab:test) Testing for statistical significance of combined functions of the two factors.
+
+| Compare      | Satistic | P.value | Method  | Alternative                      |
+|--------------|----------|---------|---------|----------------------------------|
+| Coop vs None | 0.168    |1.5e-30  | KS test |The CDF of x lies above that of y |
+| Coop vs Comp | 0.151    |2.2e-16  | KS test |The CDF of x lies above that of y |
+
+Table \@ref(tab:test)
 
 ## Binding motif analysis
 
@@ -309,32 +365,50 @@ bcout <- map(peak_groups[c('competitive', 'cooperative')],
 
 Figure \@ref(fig:occurences)
 
-```{r occurences,fig.height=3,fig.cap="Occurences of consensus sequences in the ranked regions."}
+```{r occurences,fig.height=5,fig.width=10,out.width='100%',fig.cap="Occurences of consensus sequences in the ranked regions."}
 par(mfrow = c(1, 2))
-map(bcout, ~plot(toptable(.x, 1)))
+
+# plot the occurences of consensus sequesnce in the regions
+map2(bcout, c('(A)', '(B)'),
+     ~{
+       plot(toptable(.x, 1))
+       title(.y)
+     })
 ```
 
 Figure \@ref(fig:motifs)
 
 ```{r eval=FALSE}
-map(bcout, ~seqLogo(pwm(toptable(.x, 1))))
+map(bcout, c('(A)', '(B)'),
+    ~{
+      seqLogo(pwm(toptable(.x, 1)))
+      title(.y)
+    })
 ```
 
-```{r motifs,fig.height=3,fig.cap="Predicted motifs of the cooperative and competitive binding sites."}
+```{r motifs,echo=FALSE,fig.height=5,fig.width=10,out.width='100%',fig.cap="Predicted motifs of the cooperative and competitive binding sites."}
 # solution: https://support.bioconductor.org/p/35240/
 mySeqLogo = seqLogo::seqLogo
 
 bad = (sapply( body(mySeqLogo), "==", "grid.newpage()") |
-           sapply( body(mySeqLogo), "==", "par(ask = FALSE)"))
+       sapply( body(mySeqLogo), "==", "par(ask = FALSE)"))
 body(mySeqLogo)[bad] = NULL
 
 grid.newpage()
-pushViewport(viewport(layout = grid.layout(1,2)))
-pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 1))
+pushViewport(viewport(layout = grid.layout(2, 2, heights = unit(c(0.2, 5), "null"))))
+grid.text("(A)",
+          gp = gpar(fontface = 'bold'),
+          vp = viewport(layout.pos.row = 1, layout.pos.col = 1))
+
+pushViewport(viewport(layout.pos.col = 1, layout.pos.row = 2))
 mySeqLogo(pwm(toptable(bcout$competitive, 1)))
 popViewport(1)
 
-pushViewport(viewport(layout.pos.col = 2, layout.pos.row = 1))
+grid.text("(B)",
+          gp = gpar(fontface = 'bold'),
+          vp = viewport(layout.pos.row = 1, layout.pos.col = 2))
+
+pushViewport(viewport(layout.pos.col = 2, layout.pos.row = 2))
 mySeqLogo(pwm(toptable(bcout$cooperative, 1)))
 popViewport(1) 
 ```
