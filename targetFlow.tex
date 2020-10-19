@@ -105,9 +105,9 @@ transcription-factors; DNA-binding; gene-expression; r-package; bioconductor; wo
 \clearpage
 \pagestyle{main}
 
-\textbf{R version}: R version 3.6.1 (2019-07-05)
+\textbf{R version}: R version 4.0.3 (2020-10-10)
 
-\textbf{Bioconductor version}: 3.9
+\textbf{Bioconductor version}: 3.11
 
 \hypertarget{introduction}{%
 \section{Introduction}\label{introduction}}
@@ -122,7 +122,7 @@ To illustrate the utility of this workflow, we apply it to binding data of the t
 \hypertarget{implementation}{%
 \subsection{Implementation}\label{implementation}}
 
-We developed an open source R/Bioconductor package target to implement BETA for predicting direct transcription factor targets from binding and expression data. The details of the algorithm were described here \citet{Wang2013b} In addition our implementation extends BETA to apply for factor combinations (submitted). Briefly, factor potential binding sites are identified by ChIP-sequencing and gene expression under factor perturbation by microarrays or sequencing. The distances between the peaks and the transcription start sites are used to calculate the peak scores. The sum of the scores of the individual peaks in a certain region of interest is the regions regulatory potential. A signed statistics (fold-change or t-statistics) from the differential gene expression of the factor perturbation is used to estimate the factor function. The product of the ranks of the regulatory potential and the signed statistics is the final rank of the regions.
+We developed an open source R/Bioconductor package target to implement BETA for predicting direct transcription factor targets from binding and expression data. The details of the algorithm were described here \citet{Wang2013b} In addition our implementation extends BETA to apply for factor combinations (\citet{Ahmed2020}). Briefly, factor potential binding sites are identified by ChIP-sequencing and gene expression under factor perturbation by microarrays or sequencing. The distances between the peaks and the transcription start sites are used to calculate the peak scores. The sum of the scores of the individual peaks in a certain region of interest is the regions regulatory potential. A signed statistics (fold-change or t-statistics) from the differential gene expression of the factor perturbation is used to estimate the factor function. The product of the ranks of the regulatory potential and the signed statistics is the final rank of the regions.
 
 To predict the combined function of two factors, two sets of data are required. The overlapping peaks are the potential binding sites. The product of the two signed statistics is the factor function. When the two factors agree in the direction of the regulation of a region where they both bind, they could be said to cooperate on this region. When the sign is opposite, they could be said to competitively regulate that region.
 
@@ -131,26 +131,26 @@ The package leverages the Bioconductor data structures such as GRanges and DataF
 \hypertarget{operation}{%
 \subsection{Operation}\label{operation}}
 
-The algorithm was implemented in R (\textgreater{}= 3.6) and should be able to run on any operating system. Libraries required for running the workflow are listed and loaded below. Alternatively, a docker image is available with R and the libraries installed on an Ubuntu image: \url{https://hub.docker.com/r/bcmslab/target}.
+The algorithm was implemented in R (\textgreater= 3.6) and should be able to run on any operating system. Libraries required for running the workflow are listed and loaded below. Alternatively, a docker image is available with R and the libraries installed on an Ubuntu image: \url{https://hub.docker.com/r/bcmslab/target}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# load required libraries}
-\KeywordTok{library}\NormalTok{(tidyverse)}
-\KeywordTok{library}\NormalTok{(seqLogo)}
-\KeywordTok{library}\NormalTok{(rtracklayer)}
 \KeywordTok{library}\NormalTok{(GenomicRanges)}
 \KeywordTok{library}\NormalTok{(Biostrings)}
+\KeywordTok{library}\NormalTok{(rtracklayer)}
 \KeywordTok{library}\NormalTok{(TxDb.Hsapiens.UCSC.hg19.knownGene)}
 \KeywordTok{library}\NormalTok{(BSgenome.Hsapiens.UCSC.hg19)}
 \KeywordTok{library}\NormalTok{(org.Hs.eg.db)}
+\KeywordTok{library}\NormalTok{(tidyverse)}
 \KeywordTok{library}\NormalTok{(BCRANK)}
+\KeywordTok{library}\NormalTok{(seqLogo)}
 \KeywordTok{library}\NormalTok{(target)}
 \end{Highlighting}
 \end{Shaded}
 
-\hypertarget{use-cases}{%
-\section{Use Cases}\label{use-cases}}
+\hypertarget{use-case}{%
+\section{Use Case}\label{use-case}}
 
 YY1 and YY2 belongs to the same family of transcription factors. YY1 is a zinc finger protein which direct deacetylase and histone acetyltransferases of the promoters of many genes. The results of the binding of YY1 to the regulatory regions of genes is the induction or repression of their expression. YY2 is a parloge of YY1. Similarly, it is a zinc finger protein with both activation or repression functions on its targets. Using the target analysis, we will attempt to answer the following questions. Do the two transcription factors share the same target genes? What are the consequences of the binding of each factor on its targets? If the two factors share binding sites, what is the function of the binding of the two factor to these sites?
 
@@ -199,7 +199,7 @@ The differential expression data were downloaded in tabular format. After locati
 \CommentTok{# load the expression text files}
 \NormalTok{express <-}\StringTok{ }\KeywordTok{map}\NormalTok{(expression_files,}
                \OperatorTok{~}\KeywordTok{read_tsv}\NormalTok{(.x, }\DataTypeTok{col_names =} \OtherTok{FALSE}\NormalTok{) }\OperatorTok{%>%}
-\StringTok{                 }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(}\DecValTok{2}\NormalTok{,}\DecValTok{3}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{9}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{#9}
+\StringTok{                 }\NormalTok{dplyr}\OperatorTok{::}\KeywordTok{select}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{, }\DecValTok{7}\NormalTok{, }\DecValTok{9}\NormalTok{) }\OperatorTok{%>%}\StringTok{ }\CommentTok{#9}
 \StringTok{                 }\KeywordTok{setNames}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'tf'}\NormalTok{, }\StringTok{'gene'}\NormalTok{, }\StringTok{'fc'}\NormalTok{, }\StringTok{'pvalue'}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{                 }\KeywordTok{filter}\NormalTok{(tf }\OperatorTok{%in%}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'YY1'}\NormalTok{, }\StringTok{'YY2'}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{                 }\KeywordTok{na.omit}\NormalTok{())}
@@ -256,14 +256,14 @@ The gene information in \texttt{express} is recorded using the gene SYMBOLS. The
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# load genome data}
-\NormalTok{symbol_entrez <-}\StringTok{ }\KeywordTok{select}\NormalTok{(org.Hs.eg.db,}
+\NormalTok{symbol_entrez <-}\StringTok{ }\NormalTok{AnnotationDbi}\OperatorTok{::}\KeywordTok{select}\NormalTok{(org.Hs.eg.db,}
                         \KeywordTok{unique}\NormalTok{(}\KeywordTok{c}\NormalTok{(express}\OperatorTok{$}\NormalTok{YY1}\OperatorTok{$}\NormalTok{gene)),}
                         \StringTok{'ENTREZID'}\NormalTok{, }\StringTok{'SYMBOL'}\NormalTok{) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{setNames}\NormalTok{(}\KeywordTok{c}\NormalTok{(}\StringTok{'gene'}\NormalTok{, }\StringTok{'gene_id'}\NormalTok{))}
 
 \CommentTok{# format genome to join with express}
 \NormalTok{genome <-}\StringTok{ }\KeywordTok{promoters}\NormalTok{(TxDb.Hsapiens.UCSC.hg19.knownGene,}
-            \DataTypeTok{upstream =} \DecValTok{100000}\NormalTok{,}
+            \DataTypeTok{upstream =} \DecValTok{100000}\NormalTok{, }\DataTypeTok{downstream =} \DecValTok{100000}\NormalTok{,}
             \DataTypeTok{columns =} \KeywordTok{c}\NormalTok{(}\StringTok{'tx_id'}\NormalTok{, }\StringTok{'tx_name'}\NormalTok{, }\StringTok{'gene_id'}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{as_tibble}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{gene_id =} \KeywordTok{as.character}\NormalTok{(gene_id))}
 \end{Highlighting}
@@ -308,13 +308,13 @@ To determine the dominant function of a factor, we divide the targets by the dir
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# Figure 2}
-\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{2}\NormalTok{))}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{3}\NormalTok{))}
 
 \CommentTok{# plot distance by score of associate peaks}
-\KeywordTok{map2}\NormalTok{(ap, }\KeywordTok{c}\NormalTok{(}\StringTok{'(A)'}\NormalTok{, }\StringTok{'(B)'}\NormalTok{), }\OperatorTok{~}\NormalTok{\{}
-  \KeywordTok{plot}\NormalTok{(.x}\OperatorTok{$}\NormalTok{distance, .x}\OperatorTok{$}\NormalTok{peak_score, }\DataTypeTok{xlab =} \StringTok{'Distance'}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{'Peak Score'}\NormalTok{)}
-  \KeywordTok{title}\NormalTok{(.y)}
-\NormalTok{  \})}
+\KeywordTok{plot}\NormalTok{(ap}\OperatorTok{$}\NormalTok{YY1}\OperatorTok{$}\NormalTok{distance, ap}\OperatorTok{$}\NormalTok{YY1}\OperatorTok{$}\NormalTok{peak_score,}
+     \DataTypeTok{xlab =} \StringTok{'Distance'}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{'Peak Score'}\NormalTok{,}
+     \DataTypeTok{main =} \StringTok{'(A)'}\NormalTok{)}
+\KeywordTok{points}\NormalTok{(ap}\OperatorTok{$}\NormalTok{YY2}\OperatorTok{$}\NormalTok{distance, ap}\OperatorTok{$}\NormalTok{YY2}\OperatorTok{$}\NormalTok{peak_score)}
 
 \CommentTok{# make labels, colors and groups}
 \NormalTok{labs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'down'}\NormalTok{, }\StringTok{'none'}\NormalTok{, }\StringTok{'up'}\NormalTok{)}
@@ -326,7 +326,7 @@ To determine the dominant function of a factor, we divide the targets by the dir
 \NormalTok{\})}
 
 \CommentTok{# plot the group functions}
-\KeywordTok{pmap}\NormalTok{(}\KeywordTok{list}\NormalTok{(dt, groups, }\KeywordTok{c}\NormalTok{(}\StringTok{'(C)'}\NormalTok{, }\StringTok{'(D)'}\NormalTok{)), }\ControlFlowTok{function}\NormalTok{(x, y, z) \{}
+\KeywordTok{pmap}\NormalTok{(}\KeywordTok{list}\NormalTok{(dt, groups, }\KeywordTok{c}\NormalTok{(}\StringTok{'(B)'}\NormalTok{, }\StringTok{'(C)'}\NormalTok{)), }\ControlFlowTok{function}\NormalTok{(x, y, z) \{}
       \KeywordTok{plot_predictions}\NormalTok{(x}\OperatorTok{$}\NormalTok{score_rank,}
                        \DataTypeTok{group =}\NormalTok{ y, }\DataTypeTok{colors =}\NormalTok{ cols, }\DataTypeTok{labels =}\NormalTok{ labs,}
                        \DataTypeTok{xlab =} \StringTok{'Regulatory Potential'}\NormalTok{, }\DataTypeTok{ylab =} \StringTok{'ECDF'}\NormalTok{)}
@@ -341,10 +341,10 @@ To determine the dominant function of a factor, we divide the targets by the dir
 
 }
 
-\caption{Predicted functions of YY1 and YY2 on their specific targets. Bindings peaks of the transcription factors in HeLa cells were determined using ChIP-Seq. Distances from the transcription start sites and the transformed distances of the (A) YY1 and (B) YY2 peaks are shown. The regulatory potential of each gene was calculated using target. Genes were grouped into up, none or down regulated based on the fold-change. The emperical cumulative distribution functions (ECDF) of the groups of (C) YY1 and (D) YY2 targets are shown at each regulatory potential value.}\label{fig:functions}
+\caption{Predicted functions of YY1 and YY2 on their specific targets. Bindings peaks of the transcription factors in HeLa cells were determined using ChIP-Seq. Distances from the transcription start sites and the transformed distances of the (A) YY1 and YY2 peaks are shown. The regulatory potential of each gene was calculated using target. Genes were grouped into up, none or down regulated based on the fold-change. The emperical cumulative distribution functions (ECDF) of the groups of (C) YY1 and (D) YY2 targets are shown at each regulatory potential value.}\label{fig:functions}
 \end{figure}
 
-The scores of the individual peaks are a decreasing function of the distance from the transcription start sites. The closer the factor binding site from the start site the lower the score. The distribution of these scores is very similar for both factors (Figure \ref{fig:functions}A\&B). The ECDF of the down-regulated of YY1 is higher than that of up- and none-regulated targets (Figure \ref{fig:functions}C). Therefore, the absence of YY1 on its targets result in aggregate in their down regulation. If indeed these are true targets then we expect YY1 to induce their expression. The opposite is true for YY2 where more high ranking targets are up-regulated by the factor knockdown (Figure \ref{fig:functions}D).
+The scores of the individual peaks are a decreasing function of the distance from the transcription start sites. The closer the factor binding site from the start site the lower the score. The distribution of these scores is very similar for both factors (Figure \ref{fig:functions}A). The ECDF of the down-regulated of YY1 is higher than that of up- and none-regulated targets (Figure \ref{fig:functions}B). Therefore, the absence of YY1 on its targets result in aggregate in their down regulation. If indeed these are true targets then we expect YY1 to induce their expression. The opposite is true for YY2 where more high ranking targets are up-regulated by the factor knockdown (Figure \ref{fig:functions}C).
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -377,7 +377,7 @@ Using target to predict the shared target genes and the combined function of the
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{# merge and name peaks}
-\NormalTok{common_peaks <-}\StringTok{ }\KeywordTok{reduce}\NormalTok{(}\KeywordTok{subsetByOverlaps}\NormalTok{(peaks}\OperatorTok{$}\NormalTok{YY1, peaks}\OperatorTok{$}\NormalTok{YY2))}
+\NormalTok{common_peaks <-}\StringTok{ }\NormalTok{GenomicRanges}\OperatorTok{::}\KeywordTok{reduce}\NormalTok{(}\KeywordTok{subsetByOverlaps}\NormalTok{(peaks}\OperatorTok{$}\NormalTok{YY1, peaks}\OperatorTok{$}\NormalTok{YY2))}
 \NormalTok{common_peaks}\OperatorTok{$}\NormalTok{name <-}\StringTok{ }\KeywordTok{paste0}\NormalTok{(}\StringTok{'common_peak_'}\NormalTok{, }\DecValTok{1}\OperatorTok{:}\KeywordTok{length}\NormalTok{(common_peaks))}
 \end{Highlighting}
 \end{Shaded}
