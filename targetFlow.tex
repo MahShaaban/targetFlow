@@ -131,7 +131,7 @@ The package leverages the Bioconductor data structures such as GRanges and DataF
 \hypertarget{operation}{%
 \subsection{Operation}\label{operation}}
 
-The algorithm was implemented in R (\textgreater= 3.6) and should be able to run on any operating system. Libraries required for running the workflow are listed and loaded below. Alternatively, a docker image is available with R and the libraries installed on an Ubuntu image: \url{https://hub.docker.com/r/bcmslab/target}.
+The algorithm was implemented in R (\textgreater= 3.6) and should be able to run on any operating system. Libraries required for running the workflow are listed and loaded below. Alternatively, a docker image is available with R and the libraries installed on an Ubuntu image: \url{https://hub.docker.com/r/bcmslab/target_flow}.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -263,7 +263,7 @@ The gene information in \texttt{express} is recorded using the gene SYMBOLS. The
 
 \CommentTok{# format genome to join with express}
 \NormalTok{genome <-}\StringTok{ }\KeywordTok{promoters}\NormalTok{(TxDb.Hsapiens.UCSC.hg19.knownGene,}
-            \DataTypeTok{upstream =} \DecValTok{100000}\NormalTok{, }\DataTypeTok{downstream =} \DecValTok{100000}\NormalTok{,}
+            \DataTypeTok{upstream =} \DecValTok{100000}\NormalTok{,}
             \DataTypeTok{columns =} \KeywordTok{c}\NormalTok{(}\StringTok{'tx_id'}\NormalTok{, }\StringTok{'tx_name'}\NormalTok{, }\StringTok{'gene_id'}\NormalTok{)) }\OperatorTok{%>%}
 \StringTok{  }\KeywordTok{as_tibble}\NormalTok{() }\OperatorTok{%>%}\StringTok{ }\KeywordTok{mutate}\NormalTok{(}\DataTypeTok{gene_id =} \KeywordTok{as.character}\NormalTok{(gene_id))}
 \end{Highlighting}
@@ -317,12 +317,12 @@ To determine the dominant function of a factor, we divide the targets by the dir
 \KeywordTok{points}\NormalTok{(ap}\OperatorTok{$}\NormalTok{YY2}\OperatorTok{$}\NormalTok{distance, ap}\OperatorTok{$}\NormalTok{YY2}\OperatorTok{$}\NormalTok{peak_score)}
 
 \CommentTok{# make labels, colors and groups}
-\NormalTok{labs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'down'}\NormalTok{, }\StringTok{'none'}\NormalTok{, }\StringTok{'up'}\NormalTok{)}
+\NormalTok{labs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'Down'}\NormalTok{, }\StringTok{'None'}\NormalTok{, }\StringTok{'Up'}\NormalTok{)}
 \NormalTok{cols <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'green'}\NormalTok{, }\StringTok{'gray'}\NormalTok{, }\StringTok{'red'}\NormalTok{)}
 
 \CommentTok{# make three groups by quantiles      }
 \NormalTok{groups <-}\StringTok{ }\KeywordTok{map}\NormalTok{(dt,}\OperatorTok{~}\NormalTok{\{}
-  \KeywordTok{cut}\NormalTok{(.x}\OperatorTok{$}\NormalTok{stat, }\DataTypeTok{breaks =} \KeywordTok{quantile}\NormalTok{(.x}\OperatorTok{$}\NormalTok{stat, }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{.1}\NormalTok{, }\FloatTok{.9}\NormalTok{, }\DecValTok{1}\NormalTok{)), }\DataTypeTok{labels =}\NormalTok{ labs)}
+  \KeywordTok{cut}\NormalTok{(.x}\OperatorTok{$}\NormalTok{stat, }\DataTypeTok{breaks =} \DecValTok{3}\NormalTok{, }\DataTypeTok{labels =}\NormalTok{ labs)}
 \NormalTok{\})}
 
 \CommentTok{# plot the group functions}
@@ -353,7 +353,7 @@ The scores of the individual peaks are a decreasing function of the distance fro
 \KeywordTok{map2}\NormalTok{(dt, groups,}
      \OperatorTok{~}\KeywordTok{test_predictions}\NormalTok{(.x}\OperatorTok{$}\NormalTok{rank,}
                        \DataTypeTok{group =}\NormalTok{ .y,}
-                       \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'down'}\NormalTok{, }\StringTok{'up'}\NormalTok{)))}
+                       \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'Down'}\NormalTok{, }\StringTok{'Up'}\NormalTok{)))}
 \end{Highlighting}
 \end{Shaded}
 
@@ -429,12 +429,12 @@ The output can also be visualized the same way. The targets are divided into thr
 \KeywordTok{title}\NormalTok{(}\StringTok{'(A)'}\NormalTok{)}
 
 \CommentTok{# make labels, colors and gorups}
-\NormalTok{labs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'competitive'}\NormalTok{, }\StringTok{'none'}\NormalTok{, }\StringTok{'cooperative'}\NormalTok{)}
+\NormalTok{labs <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'Competitive'}\NormalTok{, }\StringTok{'None'}\NormalTok{, }\StringTok{'Cooperative'}\NormalTok{)}
 \NormalTok{cols <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{'green'}\NormalTok{, }\StringTok{'gray'}\NormalTok{, }\StringTok{'red'}\NormalTok{)}
 
 \CommentTok{# make three groups by quantiles      }
 \NormalTok{common_groups <-}\StringTok{ }\KeywordTok{cut}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{stat,}
-                     \DataTypeTok{breaks =} \KeywordTok{quantile}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{stat, }\KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\FloatTok{.1}\NormalTok{, }\FloatTok{.9}\NormalTok{, }\DecValTok{1}\NormalTok{)),}
+                     \DataTypeTok{breaks =} \DecValTok{3}\NormalTok{,}
                      \DataTypeTok{labels =}\NormalTok{ labs)}
 
 \CommentTok{# plot predicted function}
@@ -463,13 +463,13 @@ The common peaks distances and scores take the same shape (Figure \ref{fig:funct
 \CommentTok{# test factors are cooperative}
 \KeywordTok{test_predictions}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{score_rank,}
                  \DataTypeTok{group =}\NormalTok{ common_groups,}
-                 \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'cooperative'}\NormalTok{, }\StringTok{'none'}\NormalTok{),}
+                 \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'Cooperative'}\NormalTok{, }\StringTok{'None'}\NormalTok{),}
                  \DataTypeTok{alternative =} \StringTok{'greater'}\NormalTok{)}
 
 \CommentTok{# test factors are more cooperative than competitive}
 \KeywordTok{test_predictions}\NormalTok{(common_dt}\OperatorTok{$}\NormalTok{score_rank,}
                  \DataTypeTok{group =}\NormalTok{ common_groups,}
-                 \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'cooperative'}\NormalTok{, }\StringTok{'competitive'}\NormalTok{),}
+                 \DataTypeTok{compare =} \KeywordTok{c}\NormalTok{(}\StringTok{'Cooperative'}\NormalTok{, }\StringTok{'Competitive'}\NormalTok{),}
                  \DataTypeTok{alternative =} \StringTok{'greater'}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
@@ -489,7 +489,7 @@ The common peaks distances and scores take the same shape (Figure \ref{fig:funct
 
 Any number of downstream analysis can be performed on the final output. For example, we could apply binding motif analysis to the groups of regulated targets. In this example, all the motif analysis itself is handled by the \texttt{BCRANK} package \citet{Ameur2009}. Here, we explain how to prepare the input from the shared peaks and target objects produced in the last step.
 
-First, we extract the transcript IDs of the targets in their respective groups. Then the peaks assigned to these targets are ordered and sliced. In this case we only included the top 100 peaks in each group.
+First, we extract the transcript IDs of the targets in their respective groups. Then the peaks assigned to these targets are ordered and sliced.
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -505,7 +505,7 @@ First, we extract the transcript IDs of the targets in their respective groups. 
 \NormalTok{    p <-}\StringTok{ }\NormalTok{p[}\KeywordTok{order}\NormalTok{(p}\OperatorTok{$}\NormalTok{peak_score, }\DataTypeTok{decreasing =} \OtherTok{TRUE}\NormalTok{)]}
     
     \CommentTok{# get n top peaks}
-\NormalTok{    p[}\DecValTok{1}\OperatorTok{:}\DecValTok{100}\NormalTok{]}
+\NormalTok{    p[}\KeywordTok{seq_len}\NormalTok{(}\KeywordTok{ifelse}\NormalTok{(}\KeywordTok{length}\NormalTok{(p) }\OperatorTok{>}\StringTok{ }\DecValTok{50}\NormalTok{, }\DecValTok{50}\NormalTok{, }\KeywordTok{length}\NormalTok{(p)))]}
 \NormalTok{\})}
 \end{Highlighting}
 \end{Shaded}
@@ -514,7 +514,7 @@ The input for \texttt{bcrank} is a fasta file with the sequence of the regions t
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{bcout <-}\StringTok{ }\KeywordTok{map}\NormalTok{(peak_groups[}\KeywordTok{c}\NormalTok{(}\StringTok{'competitive'}\NormalTok{, }\StringTok{'cooperative'}\NormalTok{)], }\OperatorTok{~}\NormalTok{\{}
+\NormalTok{bcout <-}\StringTok{ }\KeywordTok{map}\NormalTok{(peak_groups[}\KeywordTok{c}\NormalTok{(}\StringTok{'Competitive'}\NormalTok{, }\StringTok{'Cooperative'}\NormalTok{)], }\OperatorTok{~}\NormalTok{\{}
     \CommentTok{# extract sequences of top peaks from the hg19 genome}
 \NormalTok{    pseq <-}\StringTok{ }\KeywordTok{getSeq}\NormalTok{(BSgenome.Hsapiens.UCSC.hg19, }\DataTypeTok{names =}\NormalTok{ .x)}
                  
