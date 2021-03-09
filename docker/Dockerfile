@@ -1,4 +1,4 @@
-FROM rocker/verse:latest
+FROM bioconductor/bioconductor_docker:latest
 
 RUN apt-get -y update
 
